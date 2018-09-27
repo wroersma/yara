@@ -300,6 +300,7 @@ int module_load(
 
   json_t* summary_json;
   json_t* json;
+  json_t* behavior_json;
 
   if (module_data == NULL)
     return ERROR_SUCCESS;
@@ -326,12 +327,12 @@ int module_load(
 
   network_obj->data = (void*) json_object_get(json, "network");
 
-  json = json_object_get(json, "behavior");
-  summary_json = json_object_get(json, "summary");
+  behavior_json = json_object_get(json, "behavior");
+  summary_json = json_object_get(behavior_json, "summary");
 
-  registry_obj->data = (void*) json_object_get(summary_json, "keys");
-  filesystem_obj->data = (void*) json_object_get(summary_json, "files");
-  sync_obj->data = (void*) json_object_get(summary_json, "mutexes");
+  registry_obj->data = (void*) json_object_get(summary_json, "key_access");
+  filesystem_obj->data = (void*) json_object_get(summary_json, "file_access");
+  sync_obj->data = (void*) json_object_get(summary_json, "mutex");
 
   return ERROR_SUCCESS;
 }
