@@ -173,77 +173,227 @@ define_function(network_http_post)
           METHOD_POST));
 }
 
-
-define_function(registry_key_access)
+uint64_t summary_parser(
+    YR_SCAN_CONTEXT* context,
+    YR_OBJECT* summary_obj,
+    RE* regexp_value,
+    json_t* value_json)
 {
-  YR_SCAN_CONTEXT* context = scan_context();
-  YR_OBJECT* registry_obj = parent();
-
-  json_t* keys_json = (json_t*) registry_obj->data;
   json_t* value;
 
   uint64_t result = 0;
   size_t index;
 
-  json_array_foreach(keys_json, index, value)
+  json_array_foreach(value_json, index, value)
   {
-    if (yr_re_match(context, regexp_argument(1), json_string_value(value)) > 0)
+    if (yr_re_match(context, regexp_value, json_string_value(value)) > 0)
     {
       result = 1;
       break;
     }
   }
 
-  return_integer(result);
+  return result;
+}
+
+
+define_function(registry_key_access)
+{
+  YR_OBJECT* summary_obj = parent();
+  json_t* keys_json = (json_t*) summary_obj->data;
+  json_t* value_json = json_object_get(keys_json, "key_access");
+  return_integer(
+      summary_parser(
+          scan_context(),
+          parent(),
+          regexp_argument(1),
+          value_json));
 }
 
 
 define_function(filesystem_file_access)
 {
-  YR_SCAN_CONTEXT* context = scan_context();
-  YR_OBJECT* filesystem_obj = parent();
-
-  json_t* files_json = (json_t*) filesystem_obj->data;
-  json_t* value;
-
-  uint64_t result = 0;
-  size_t index;
-
-  json_array_foreach(files_json, index, value)
-  {
-    if (yr_re_match(context, regexp_argument(1), json_string_value(value)) > 0)
-    {
-      result = 1;
-      break;
-    }
-  }
-
-  return_integer(result);
+  YR_OBJECT* summary_obj = parent();
+  json_t* keys_json = (json_t*) summary_obj->data;
+  json_t* value_json = json_object_get(keys_json, "file_access");
+  return_integer(
+      summary_parser(
+          scan_context(),
+          parent(),
+          regexp_argument(1),
+          value_json));
 }
 
 
-
-define_function(sync_mutex)
+define_function(summary_mutex)
 {
-  YR_SCAN_CONTEXT* context = scan_context();
-  YR_OBJECT* sync_obj = parent();
+  YR_OBJECT* summary_obj = parent();
+  json_t* keys_json = (json_t*) summary_obj->data;
+  json_t* value_json = json_object_get(keys_json, "mutex");
+  return_integer(
+      summary_parser(
+          scan_context(),
+          parent(),
+          regexp_argument(1),
+          value_json));
+}
 
-  json_t* mutexes_json = (json_t*) sync_obj->data;
-  json_t* value;
+define_function(summary_dll_loaded)
+{
+  YR_OBJECT* summary_obj = parent();
+  json_t* keys_json = (json_t*) summary_obj->data;
+  json_t* value_json = json_object_get(keys_json, "dll_loaded");
+  return_integer(
+      summary_parser(
+          scan_context(),
+          parent(),
+          regexp_argument(1),
+          value_json));
+}
 
-  uint64_t result = 0;
-  size_t index;
+define_function(summary_file_created)
+{
+  YR_OBJECT* summary_obj = parent();
+  json_t* keys_json = (json_t*) summary_obj->data;
+  json_t* value_json = json_object_get(keys_json, "file_created");
+  return_integer(
+      summary_parser(
+          scan_context(),
+          parent(),
+          regexp_argument(1),
+          value_json));
+}
 
-  json_array_foreach(mutexes_json, index, value)
-  {
-    if (yr_re_match(context, regexp_argument(1), json_string_value(value)) > 0)
-    {
-      result = 1;
-      break;
-    }
-  }
+define_function(summary_file_recreated)
+{
+  YR_OBJECT* summary_obj = parent();
+  json_t* keys_json = (json_t*) summary_obj->data;
+  json_t* value_json = json_object_get(keys_json, "file_recreated");
+  return_integer(
+      summary_parser(
+          scan_context(),
+          parent(),
+          regexp_argument(1),
+          value_json));
+}
 
-  return_integer(result);
+define_function(summary_directory_created)
+{
+  YR_OBJECT* summary_obj = parent();
+  json_t* keys_json = (json_t*) summary_obj->data;
+  json_t* value_json = json_object_get(keys_json, "directory_created");
+  return_integer(
+      summary_parser(
+          scan_context(),
+          parent(),
+          regexp_argument(1),
+          value_json));
+}
+
+define_function(summary_file_failed)
+{
+  YR_OBJECT* summary_obj = parent();
+  json_t* keys_json = (json_t*) summary_obj->data;
+  json_t* value_json = json_object_get(keys_json, "file_failed");
+  return_integer(
+      summary_parser(
+          scan_context(),
+          parent(),
+          regexp_argument(1),
+          value_json));
+}
+
+define_function(summary_command_line)
+{
+  YR_OBJECT* summary_obj = parent();
+  json_t* keys_json = (json_t*) summary_obj->data;
+  json_t* value_json = json_object_get(keys_json, "command_line");
+  return_integer(
+      summary_parser(
+          scan_context(),
+          parent(),
+          regexp_argument(1),
+          value_json));
+}
+
+define_function(summary_regkey_opened)
+{
+  YR_OBJECT* summary_obj = parent();
+  json_t* keys_json = (json_t*) summary_obj->data;
+  json_t* value_json = json_object_get(keys_json, "regkey_opened");
+  return_integer(
+      summary_parser(
+          scan_context(),
+          parent(),
+          regexp_argument(1),
+          value_json));
+}
+
+define_function(summary_file_written)
+{
+  YR_OBJECT* summary_obj = parent();
+  json_t* keys_json = (json_t*) summary_obj->data;
+  json_t* value_json = json_object_get(keys_json, "file_written");
+  return_integer(
+      summary_parser(
+          scan_context(),
+          parent(),
+          regexp_argument(1),
+          value_json));
+}
+
+define_function(summary_file_deleted)
+{
+  YR_OBJECT* summary_obj = parent();
+  json_t* keys_json = (json_t*) summary_obj->data;
+  json_t* value_json = json_object_get(keys_json, "file_deleted");
+  return_integer(
+      summary_parser(
+          scan_context(),
+          parent(),
+          regexp_argument(1),
+          value_json));
+}
+
+define_function(summary_file_exists)
+{
+  YR_OBJECT* summary_obj = parent();
+  json_t* keys_json = (json_t*) summary_obj->data;
+  json_t* value_json = json_object_get(keys_json, "file_exists");
+  return_integer(
+      summary_parser(
+          scan_context(),
+          parent(),
+          regexp_argument(1),
+          value_json));
+}
+
+
+define_function(summary_regkey_read)
+{
+  YR_OBJECT* summary_obj = parent();
+  json_t* keys_json = (json_t*) summary_obj->data;
+  json_t* value_json = json_object_get(keys_json, "regkey_read");
+  return_integer(
+      summary_parser(
+          scan_context(),
+          parent(),
+          regexp_argument(1),
+          value_json));
+}
+
+
+define_function(summary_directory_enumerated)
+{
+  YR_OBJECT* summary_obj = parent();
+  json_t* keys_json = (json_t*) summary_obj->data;
+  json_t* value_json = json_object_get(keys_json, "directory_enumerated");
+  return_integer(
+      summary_parser(
+          scan_context(),
+          parent(),
+          regexp_argument(1),
+          value_json));
 }
 
 
@@ -256,17 +406,24 @@ begin_declarations;
     declare_function("http_request", "r", "i", network_http_request);
   end_struct("network");
 
-  begin_struct("registry");
+  begin_struct("summary");
     declare_function("key_access", "r", "i", registry_key_access);
-  end_struct("registry");
-
-  begin_struct("filesystem");
     declare_function("file_access", "r", "i", filesystem_file_access);
-  end_struct("filesystem");
+    declare_function("file_created", "r", "i", summary_file_created);
+    declare_function("file_recreated", "r", "i", summary_file_recreated);
+    declare_function("file_failed", "r", "i", summary_file_failed);
+    declare_function("mutex", "r", "i", summary_mutex);
+    declare_function("dll_loaded", "r", "i", summary_dll_loaded);
+    declare_function("directory_created", "r", "i", summary_directory_created);
+    declare_function("command_line", "r", "i", summary_command_line);
+    declare_function("regkey_opened", "r", "i", summary_regkey_opened);
+    declare_function("file_written", "r", "i", summary_file_written);
+    declare_function("file_deleted", "r", "i", summary_file_deleted);
+    declare_function("file_exists", "r", "i", summary_file_exists);
+    declare_function("regkey_read", "r", "i", summary_regkey_read);
+    declare_function("directory_enumerated", "r", "i", summary_directory_enumerated);
 
-  begin_struct("sync");
-    declare_function("mutex", "r", "i", sync_mutex);
-  end_struct("sync");
+  end_struct("summary");
 
 end_declarations;
 
@@ -292,13 +449,10 @@ int module_load(
     size_t module_data_size)
 {
   YR_OBJECT* network_obj;
-  YR_OBJECT* registry_obj;
-  YR_OBJECT* filesystem_obj;
-  YR_OBJECT* sync_obj;
+  YR_OBJECT* summary_obj;
 
   json_error_t json_error;
 
-  json_t* summary_json;
   json_t* json;
   json_t* behavior_json;
 
@@ -321,18 +475,13 @@ int module_load(
   module_object->data = (void*) json;
 
   network_obj = get_object(module_object, "network");
-  registry_obj = get_object(module_object, "registry");
-  filesystem_obj = get_object(module_object, "filesystem");
-  sync_obj = get_object(module_object, "sync");
+  summary_obj = get_object(module_object, "summary");
 
   network_obj->data = (void*) json_object_get(json, "network");
 
   behavior_json = json_object_get(json, "behavior");
-  summary_json = json_object_get(behavior_json, "summary");
 
-  registry_obj->data = (void*) json_object_get(summary_json, "key_access");
-  filesystem_obj->data = (void*) json_object_get(summary_json, "file_access");
-  sync_obj->data = (void*) json_object_get(summary_json, "mutex");
+  summary_obj->data = (void*) json_object_get(behavior_json, "summary");
 
   return ERROR_SUCCESS;
 }
